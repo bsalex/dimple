@@ -22,7 +22,8 @@
                 removed,
                 xFloat = !series._isStacked() && series.x._hasMeasure(),
                 yFloat = !series._isStacked() && series.y._hasMeasure(),
-                cat = "none";
+                cat = "none",
+                theseShapesSel;
 
             if (series.x._hasCategories() && series.y._hasCategories()) {
                 cat = "both";
@@ -43,7 +44,7 @@
             }
 
             // Add
-            theseShapes
+            theseShapesSel = theseShapes
                 .enter()
                 .append("rect")
                 .attr("id", function (d) { return dimple._createClass([d.key]); })
@@ -76,23 +77,23 @@
                 .attr("height", function (d) { return (cat === "y" ?  dimple._helpers.height(d, chart, series) : 0); })
                 .on("mouseover", function (e) { dimple._showBarTooltip(e, this, chart, series); })
                 .on("mouseleave", function (e) { dimple._removeTooltip(e, this, chart, series); })
-                .call(function () {
+                .call(function (element) {
                     if (!chart.noFormats) {
-                        this.attr("opacity", function (d) { return dimple._helpers.opacity(d, chart, series); })
+                        element.attr("opacity", function (d) { return dimple._helpers.opacity(d, chart, series); })
                             .style("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
                             .style("stroke", function (d) { return dimple._helpers.stroke(d, chart, series); });
                     }
                 });
 
             // Update
-            updated = chart._handleTransition(theseShapes, duration, chart, series)
+            updated = chart._handleTransition(theseShapesSel, duration, chart, series)
                 .attr("x", function (d) { return xFloat ? dimple._helpers.cx(d, chart, series) - series.x.floatingBarWidth / 2 : dimple._helpers.x(d, chart, series); })
                 .attr("y", function (d) { return yFloat ? dimple._helpers.cy(d, chart, series) - series.y.floatingBarWidth / 2 : dimple._helpers.y(d, chart, series); })
                 .attr("width", function (d) { return (xFloat ? series.x.floatingBarWidth : dimple._helpers.width(d, chart, series)); })
                 .attr("height", function (d) { return (yFloat ? series.y.floatingBarWidth : dimple._helpers.height(d, chart, series)); })
-                .call(function () {
+                .call(function (element) {
                     if (!chart.noFormats) {
-                        this.attr("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
+                        element.attr("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
                             .attr("stroke", function (d) { return dimple._helpers.stroke(d, chart, series); });
                     }
                 });

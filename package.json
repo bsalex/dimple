@@ -1,6 +1,6 @@
 {
   "name": "@bsalex/dimple",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "private": false,
   "licenses": [
     {
@@ -31,7 +31,7 @@
     "requirejs": "~2.1.10"
   },
   "buildDependencies": {
-    "d3": "4.0.0"
+    "d3": "5.5.0"
   },
   "description": "Dimple is an object-oriented API allowing you to create flexible axis-based charts using [d3.js](http://d3js.org \"d3.js\").",
   "directories": {

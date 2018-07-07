@@ -17,6 +17,7 @@
                 classes = ["dimple-series-" + chart.series.indexOf(series), "dimple-pie"],
                 updated,
                 removed,
+                theseShapesSel,
                 getOuterBase = function (d) {
                     var oR;
                     if (series.x && series.y) {
@@ -44,7 +45,7 @@
                     // Calculate the radii of the circles
                     var arc;
                     // The actual arc
-                    arc = d3.svg.arc()
+                    arc = d3.arc()
                         .innerRadius(getInnerRadius(d))
                         .outerRadius(getOuterRadius(d));
                     // Return the value
@@ -56,7 +57,7 @@
                     var i = d3.interpolate(this._current, a),
                         arc;
                     // The actual arc
-                    arc = d3.svg.arc()
+                    arc = d3.arc()
                         .innerRadius(function (d) { return d.innerRadius; })
                         .outerRadius(function (d) { return d.outerRadius; });
                     this._current = i(0);
@@ -99,7 +100,7 @@
             }
 
             // Add
-            theseShapes
+            theseShapesSel = theseShapes
                 .enter()
                 .append("path")
                 .attr("id", function (d) { return dimple._createClass([d.key]); })
@@ -112,9 +113,9 @@
                 .attr("d", getArc)
                 .on("mouseover", function (e) { dimple._showBarTooltip(e, this, chart, series); })
                 .on("mouseleave", function (e) { dimple._removeTooltip(e, this, chart, series); })
-                .call(function () {
+                .call(function (element) {
                     if (!chart.noFormats) {
-                        this.attr("opacity", function (d) { return dimple._helpers.opacity(d, chart, series); })
+                        element.attr("opacity", function (d) { return dimple._helpers.opacity(d, chart, series); })
                             .style("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
                             .style("stroke", function (d) { return dimple._helpers.stroke(d, chart, series); });
                     }
@@ -127,15 +128,15 @@
                 });
 
             // Update
-            updated = chart._handleTransition(theseShapes, duration, chart, series)
-                .call(function () {
+            updated = chart._handleTransition(theseShapesSel, duration, chart, series)
+                .call(function (element) {
                     if (duration && duration > 0) {
-                        this.attrTween("d", arcTween);
+                        element.attrTween("d", arcTween);
                     } else {
-                        this.attr("d", getArc);
+                        element.attr("d", getArc);
                     }
                     if (!chart.noFormats) {
-                        this.attr("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
+                        element.attr("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
                             .attr("stroke", function (d) { return dimple._helpers.stroke(d, chart, series); });
                     }
                 })

@@ -5,7 +5,7 @@
   {scriptDependencies}
   <script type="text/javascript">
     var svg = dimple.newSvg("#chartContainer", 590, 400);
-    d3.tsv("/data/example_data.tsv", function (data) {
+    d3.tsv("/data/example_data.tsv").then(function (data) {
       data = dimple.filterData(data, "Owner", ["Aperture", "Black Mesa"])
       var myChart = new dimple.chart(svg, data);
       myChart.setBounds(60, 30, 500, 330);
@@ -13,7 +13,7 @@
       x.addGroupOrderRule("Date");
       myChart.addMeasureAxis("y", "Unit Sales");
       var s = myChart.addSeries("Owner", dimple.plot.line);
-      s.interpolation = "step";
+      s.interpolation = d3.curveStep;
       s.barGap = 0.05;
       myChart.draw();
     });

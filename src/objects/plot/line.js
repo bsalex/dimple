@@ -31,6 +31,7 @@
                 updated,
                 removed,
                 orderedSeriesArray,
+                theseShapesSel,
                 onEnter = function () {
                     return function (e, shape, chart, series) {
                         d3.select(shape).style("opacity", 1);
@@ -48,7 +49,7 @@
                 },
                 coord = function (position, datum) {
                     var val;
-                    if (series.interpolation === "step" && series[position]._hasCategories()) {
+                    if (series.interpolation === d3.curveStep && series[position]._hasCategories()) {
                         series.barGap = 0;
                         series.clusterBarGap = 0;
                         val = dimple._helpers[position](datum, chart, series) + (position === "y" ? dimple._helpers.height(datum, chart, series) : 0);
@@ -60,14 +61,14 @@
                     return parseFloat(val.toFixed(1));
                 },
                 getLine = function (inter, originProperty) {
-                    return d3.svg.line()
+                    return d3.line()
                         .x(function (d) { return (series.x._hasCategories() || !originProperty ? d.x : series.x[originProperty]); })
                         .y(function (d) { return (series.y._hasCategories() || !originProperty ? d.y : series.y[originProperty]); })
-                        .interpolate(inter);
+                        .curve(inter);
                 };
 
             // Handle the special interpolation handling for step
-            interpolation =  (series.interpolation === "step" ? "step-after" : series.interpolation);
+            interpolation =  (series.interpolation === d3.curveStep ? d3.curveStepAfter : series.interpolation);
 
             // Get the array of ordered values
             orderedSeriesArray = dimple._getSeriesOrder(series.data || chart.data, series);
@@ -140,7 +141,7 @@
                 // This is a little tricky but we need to add a new point duplicating the last category value.  In order
                 // to place the point we need to calculate the gap between the last x and the penultimate x and apply that
                 // gap again.
-                if (series.interpolation === "step" && lineData[i].points.length > 1) {
+                if (series.interpolation === d3.curveStep && lineData[i].points.length > 1) {
                     if (series.x._hasCategories()) {
                         lineData[i].points.push({
                             x : 2 * lineData[i].points[lineData[i].points.length - 1].x - lineData[i].points[lineData[i].points.length - 2].x,
@@ -187,7 +188,7 @@
             }
 
             // Add
-            theseShapes
+            theseShapesSel = theseShapes
                 .enter()
                 .append("path")
                 .attr("id", function (d) { return dimple._createClass([d.key]); })
@@ -197,10 +198,10 @@
                 .attr("d", function (d) {
                     return d.entry;
                 })
-                .call(function () {
+                .call(function (element) {
                     // Apply formats optionally
                     if (!chart.noFormats) {
-                        this.attr("opacity", function (d) { return (graded ? 1 : d.color.opacity); })
+                        element.attr("opacity", function (d) { return (graded ? 1 : d.color.opacity); })
                             .style("fill", "none")
                             .style("stroke", function (d) { return (graded ? "url(#" + dimple._createClass(["fill-line-gradient-" + d.keyString]) + ")" : d.color.stroke); })
                             .style("stroke-width", series.lineWeight);
@@ -213,7 +214,7 @@
                 });
 
             // Update
-            updated = chart._handleTransition(theseShapes, duration, chart)
+            updated = chart._handleTransition(theseShapesSel, duration, chart)
                 .attr("d", function (d) { return d.update; })
                 .each(function (d) {
                     // Pass line data to markers

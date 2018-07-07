@@ -5,8 +5,8 @@
 <meta charset="utf-8">
 <html>
 <div id="chartContainer">
-  <script src="/lib/d3.v4.0.0.js"></script>
-  <script src="/dist/dimple.v2.4.0.js"></script>
+  <script src="/lib/d3.v5.5.0.js"></script>
+  <script src="/dist/@bsalex/dimple.v2.5.0.js"></script>
   <script type="text/javascript">
     var svg = dimple.newSvg("#chartContainer", 590, 400);
 
@@ -82,7 +82,7 @@
     y.overrideMax = new Date("01/01/2000 6:00 pm");
 
     // Show a label for every 4 weeks.
-    x.timePeriod = d3.time.weeks;
+    x.timePeriod = d3.timeWeek;
     x.timeInterval = 4;
 
     // Control bubble sizes by setting the max and min values    

@@ -47,6 +47,7 @@
                 lastAngle,
                 catCoord,
                 valCoord,
+                theseShapesSel,
                 onEnter = function () {
                     return function (e, shape, chart, series) {
                         d3.select(shape).style("opacity", 1);
@@ -64,7 +65,7 @@
                 },
                 coord = function (position, datum) {
                     var val;
-                    if (series.interpolation === "step" && series[position]._hasCategories()) {
+                    if (series.interpolation === d3.curveStep && series[position]._hasCategories()) {
                         val = dimple._helpers[position](datum, chart, series) + (position === "y" ? dimple._helpers.height(datum, chart, series) : 0);
                         if (series[position].categoryFields.length < 2) {
                             val += (position === "y" ? 1 : -1) * dimple._helpers[position + "Gap"](chart, series);
@@ -78,10 +79,10 @@
                     return parseFloat(val);
                 },
                 getArea = function (inter, originProperty) {
-                    return d3.svg.line()
+                    return d3.line()
                         .x(function (d) { return (series.x._hasCategories() || !originProperty ? d.x : series.x[originProperty]); })
                         .y(function (d) { return (series.y._hasCategories() || !originProperty ? d.y : series.y[originProperty]); })
-                        .interpolate(inter);
+                        .curve(inter);
                 },
                 sortByVal = function (a, b) {
                     return parseFloat(a) - parseFloat(b);
@@ -111,7 +112,7 @@
                 };
 
             // Handle the special interpolation handling for step
-            interpolation =  (series.interpolation === "step" ? "step-after" : series.interpolation);
+            interpolation =  (series.interpolation === d3.curveStep ? d3.curveStepAfter : series.interpolation);
 
             // Get the array of ordered values
             orderedSeriesArray = dimple._getSeriesOrder(series.data || chart.data, series);
@@ -198,7 +199,7 @@
                 // This is a little tricky but we need to add a new point duplicating the last category value.  In order
                 // to place the point we need to calculate the gap between the last x and the penultimate x and apply that
                 // gap again.
-                if (series.interpolation === "step" && points.length > 1 && catCoord) {
+                if (series.interpolation === d3.curveStep && points.length > 1 && catCoord) {
                     if (series.x._hasCategories()) {
                         points.push({
                             x : 2 * points[points.length - 1].x - points[points.length - 2].x,
@@ -308,20 +309,20 @@
 
                 // Get the points that this area will appear
                 p = getArea(interpolation, "_previousOrigin")(finalPointArray);
-                b = getArea((interpolation === "step-after" ? "step-before" : (interpolation === "step-before" ? "step-after" : interpolation)), "_previousOrigin")(basePoints);
-                l = getArea("linear", "_previousOrigin")(finalPointArray);
+                b = getArea((interpolation === d3.curveStepAfter ? d3.curveStepBefore : (interpolation === d3.curveStepBefore ? d3.curveStepAfter : interpolation)), "_previousOrigin")(basePoints);
+                l = getArea(d3.curveLinear, "_previousOrigin")(finalPointArray);
                 lIndex = l.indexOf("L") === -1 ? undefined : l.indexOf("L");
                 areaData[i].entry = p + (b && b.length > 0 ? "L" + b.substring(1) : "") + (l && l.length > 0 ? "L" + l.substring(1, lIndex) : 0);
 
                 p = getArea(interpolation)(finalPointArray);
-                b = getArea(interpolation === "step-after" ? "step-before" : (interpolation === "step-before" ? "step-after" : interpolation))(basePoints);
-                l = getArea("linear")(finalPointArray);
+                b = getArea(interpolation === d3.curveStepAfter ? d3.curveStepBefore : (interpolation === d3.curveStepBefore ? d3.curveStepAfter : interpolation))(basePoints);
+                l = getArea(d3.curveLinear)(finalPointArray);
                 lIndex = l.indexOf("L") === -1 ? undefined : l.indexOf("L");
                 areaData[i].update = p + (b && b.length > 0 ? "L" + b.substring(1) : "") + (l && l.length > 0 ? "L" + l.substring(1, lIndex) : 0);
 
                 p = getArea(interpolation, "_origin")(finalPointArray);
-                b = getArea((interpolation === "step-after" ? "step-before" : (interpolation === "step-before" ? "step-after" : interpolation)), "_origin")(basePoints);
-                l = getArea("linear", "_origin")(finalPointArray);
+                b = getArea((interpolation === d3.curveStepAfter ? d3.curveStepBefore : (interpolation === d3.curveStepBefore ? d3.curveStepAfter : interpolation)), "_origin")(basePoints);
+                l = getArea(d3.curveLinear, "_origin")(finalPointArray);
                 lIndex = l.indexOf("L") === -1 ? undefined : l.indexOf("L");
                 areaData[i].exit = p + (b && b.length > 0 ? "L" + b.substring(1) : "") + (l && l.length > 0 ? "L" + l.substring(1, lIndex) : 0);
 
@@ -342,16 +343,16 @@
             }
 
             // Add
-            theseShapes
+            theseShapesSel = theseShapes
                 .enter()
                 .append("path")
                 .attr("id", function (d) { return dimple._createClass([d.key]); })
                 .attr("class", function (d) { return className + " dimple-line " + d.keyString + " " + chart.customClassList.areaSeries + " " + d.css; })
                 .attr("d", function (d) { return d.entry; })
-                .call(function () {
+                .call(function (element) {
                     // Apply formats optionally
                     if (!chart.noFormats) {
-                        this.attr("opacity", function (d) { return (graded ? 1 : d.color.opacity); })
+                        element.attr("opacity", function (d) { return (graded ? 1 : d.color.opacity); })
                             .style("fill", function (d) { return (graded ? "url(#" + dimple._createClass(["fill-area-gradient-" + d.keyString]) + ")" : d.color.fill); })
                             .style("stroke", function (d) { return (graded ? "url(#" + dimple._createClass(["stroke-area-gradient-" + d.keyString]) + ")" : d.color.stroke); })
                             .style("stroke-width", series.lineWeight);
@@ -364,7 +365,7 @@
                 });
 
             // Update
-            updated = chart._handleTransition(theseShapes, duration, chart)
+            updated = chart._handleTransition(theseShapesSel, duration, chart)
                 .attr("d", function (d) { return d.update; })
                 .each(function (d) {
                     // Pass line data to markers

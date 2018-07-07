@@ -100,6 +100,7 @@ module.exports = function(grunt) {
                 exampleOutputPath: 'examples/',
                 libPath: '/lib/',
                 distPath: '/dist/',
+                pkgName: '<%= pkg.name %>',
                 version: 'v<%= pkg.version %>',
                 d3version: 'v<%= pkg.buildDependencies.d3 %>',
                 scriptTag: '{scriptDependencies}',
@@ -131,6 +132,13 @@ module.exports = function(grunt) {
             }
         },
         watch: {
+            srcBuild: {
+                files: [
+                    '<%= concat.test.src %>',
+                    '<%= prop.dist.src %>'
+                ],
+                tasks: ['default']
+            },
             src: {
                 files: [
                     '<%= concat.test.src %>'
@@ -160,7 +168,7 @@ module.exports = function(grunt) {
     grunt.registerMultiTask('prop', 'Propagate Versions.', function () {
         function generateScriptElements(options, indent) {
             var d3Path = "{libFolder}d3.{d3version}.js",
-                dimplePath = "{distFolder}dimple.{version}.js",
+                dimplePath = "{distFolder}{pkgName}.{version}.js",
                 createScriptElement = function (path) {
                     var scriptElement = '<script src="{path}"></script>';
                     return scriptElement.split("{path}").join(path);
@@ -169,6 +177,7 @@ module.exports = function(grunt) {
                 distPath = options.distPath,
                 version = options.version,
                 d3version = options.d3version,
+                pkgName = options.pkgName,
                 tab = "",
                 i;
 
@@ -181,6 +190,7 @@ module.exports = function(grunt) {
 
             d3Path = d3Path.split("{libFolder}").join(libPath);
             d3Path = d3Path.split("{d3version}").join(d3version);
+            dimplePath = dimplePath.split("{pkgName}").join(pkgName);
             dimplePath = dimplePath.split("{distFolder}").join(distPath);
             dimplePath = dimplePath.split("{version}").join(version);
 

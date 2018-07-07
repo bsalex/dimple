@@ -11,12 +11,12 @@
             });
             removed.remove();
         } else {
-            updated.each("end", function (d, i) {
+            updated.on("end", function (d, i) {
                 if (series.afterDraw !== null && series.afterDraw !== undefined) {
                     series.afterDraw(this, d, i);
                 }
             });
-            removed.each("end", function () {
+            removed.on("end", function () {
                 d3.select(this).remove();
             });
         }
