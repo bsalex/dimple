@@ -69,10 +69,10 @@
                     .attr("y1", (y < dropDest.y ? y + height : y))
                     .attr("x2", (x < series.x._origin ? x + offset : x + width - offset))
                     .attr("y2", (y < dropDest.y ? y + height : y))
-                    .call(function () {
+                    .call(function (context) {
                         // Apply formats optionally
                         if (!chart.noFormats) {
-                            this.style("fill", "none")
+                            context.style("fill", "none")
                                 .style("stroke", fill)
                                 .style("stroke-width", 2)
                                 .style("stroke-dasharray", ("3, 3"))
