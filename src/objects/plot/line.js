@@ -45,6 +45,7 @@
                     };
                 },
                 drawMarkers = function (d, context) {
+                    console.log(123);
                     dimple._drawMarkers(d, chart, series, duration, className, graded, onEnter(d), onLeave(d), context);
                 },
                 coord = function (position, datum) {
@@ -209,15 +210,17 @@
                 })
                 .each(function (d) {
                     // Pass line data to markers
+                    console.log(1);
                     d.markerData = d.data;
                     drawMarkers(d, this);
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart)
                 .attr("d", function (d) { return d.update; })
                 .each(function (d) {
                     // Pass line data to markers
+                    console.log(2);
                     d.markerData = d.data;
                     drawMarkers(d, this);
                 });
@@ -235,7 +238,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
 
         }
     };

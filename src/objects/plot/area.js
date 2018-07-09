@@ -362,7 +362,7 @@
                     // Pass line data to markers
                     d.markerData = d.data;
                     drawMarkers(d, this);
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart)
@@ -386,7 +386,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
 
         }
     };

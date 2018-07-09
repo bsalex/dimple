@@ -58,7 +58,7 @@
                             .style("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
                             .style("stroke", function (d) { return dimple._helpers.stroke(d, chart, series); });
                     }
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart, series)
@@ -81,6 +81,6 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
         }
     };

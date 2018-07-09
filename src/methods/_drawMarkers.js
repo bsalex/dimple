@@ -5,7 +5,8 @@
         var markers,
             markerClasses = ["dimple-marker", className, lineDataRow.keyString],
             rem,
-            shapes;
+            shapes,
+            shapesEnterAndUpdate;
 
         // Deal with markers in the same way as main series to fix #28
         if (series._markers === null || series._markers === undefined || series._markers[lineDataRow.keyString] === undefined) {
@@ -21,7 +22,7 @@
         } else {
             shapes = markers.enter().append("circle");
         }
-        shapes
+        shapesEnterAndUpdate = shapes
             .attr("id", function (d) {
                 return dimple._createClass([d.key + " Marker"]);
             })
@@ -58,10 +59,10 @@
                             return (useGradient ? dimple._helpers.fill(d, chart, series) : lineDataRow.color.stroke);
                         });
                 }
-            });
+            }).merge(markers);
 
         // Update
-        chart._handleTransition(markers, duration, chart)
+        chart._handleTransition(shapesEnterAndUpdate, duration, chart)
             .attr("cx", function (d) { return dimple._helpers.cx(d, chart, series); })
             .attr("cy", function (d) { return dimple._helpers.cy(d, chart, series); })
             .attr("r", 2 + series.lineWeight)

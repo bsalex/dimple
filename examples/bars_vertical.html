@@ -8,9 +8,10 @@
   <script src="/lib/d3.v5.5.0.js"></script>
   <script src="/dist/@bsalex/dimple.v2.5.0.js"></script>
   <script type="text/javascript">
+    var myChart;
     var svg = dimple.newSvg("#chartContainer", 590, 400);
     d3.tsv("/data/example_data.tsv").then(function (data) {
-      var myChart = new dimple.chart(svg, data);
+      myChart = new dimple.chart(svg, data);
       myChart.setBounds(60, 30, 510, 305)
       var x = myChart.addCategoryAxis("x", "Month");
       x.addOrderRule("Date");

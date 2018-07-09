@@ -125,7 +125,7 @@
                     this._current = d;
                     d.innerRadius = getInnerRadius(d);
                     d.outerRadius = getOuterRadius(d);
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart, series)
@@ -150,6 +150,6 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
         }
     };

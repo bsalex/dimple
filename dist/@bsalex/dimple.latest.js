@@ -213,7 +213,7 @@
                     };
                 } else {
                     dp = Math.max(0, -Math.floor(Math.log(this._tick_step) / Math.LN10));
-                    returnFormat = d3.format(",." + dp + "f");
+                    returnFormat = d3.format(",." + (Number.isFinite(dp) ? dp : 0) + "f");
                 }
             } else {
                 returnFormat = function (n) { return n; };
@@ -3478,7 +3478,7 @@
                     // Pass line data to markers
                     d.markerData = d.data;
                     drawMarkers(d, this);
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart)
@@ -3502,7 +3502,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
 
         }
     };
@@ -3593,7 +3593,7 @@
                             .style("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
                             .style("stroke", function (d) { return dimple._helpers.stroke(d, chart, series); });
                     }
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart, series)
@@ -3634,7 +3634,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
         }
     };
 
@@ -3699,7 +3699,7 @@
                             .style("fill", function (d) { return dimple._helpers.fill(d, chart, series); })
                             .style("stroke", function (d) { return dimple._helpers.stroke(d, chart, series); });
                     }
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart, series)
@@ -3722,7 +3722,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
         }
     };
 
@@ -3773,6 +3773,7 @@
                     };
                 },
                 drawMarkers = function (d, context) {
+                    console.log(123);
                     dimple._drawMarkers(d, chart, series, duration, className, graded, onEnter(d), onLeave(d), context);
                 },
                 coord = function (position, datum) {
@@ -3937,15 +3938,17 @@
                 })
                 .each(function (d) {
                     // Pass line data to markers
+                    console.log(1);
                     d.markerData = d.data;
                     drawMarkers(d, this);
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart)
                 .attr("d", function (d) { return d.update; })
                 .each(function (d) {
                     // Pass line data to markers
+                    console.log(2);
                     d.markerData = d.data;
                     drawMarkers(d, this);
                 });
@@ -3963,7 +3966,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
 
         }
     };
@@ -4096,7 +4099,7 @@
                     this._current = d;
                     d.innerRadius = getInnerRadius(d);
                     d.outerRadius = getOuterRadius(d);
-                });
+                }).merge(theseShapes);
 
             // Update
             updated = chart._handleTransition(theseShapesSel, duration, chart, series)
@@ -4121,7 +4124,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapes;
+            series.shapes = theseShapesSel;
         }
     };
     // Copyright: 2015 AlignAlytics
@@ -4323,7 +4326,8 @@
         var markers,
             markerClasses = ["dimple-marker", className, lineDataRow.keyString],
             rem,
-            shapes;
+            shapes,
+            shapesEnterAndUpdate;
 
         // Deal with markers in the same way as main series to fix #28
         if (series._markers === null || series._markers === undefined || series._markers[lineDataRow.keyString] === undefined) {
@@ -4339,7 +4343,7 @@
         } else {
             shapes = markers.enter().append("circle");
         }
-        shapes
+        shapesEnterAndUpdate = shapes
             .attr("id", function (d) {
                 return dimple._createClass([d.key + " Marker"]);
             })
@@ -4376,10 +4380,10 @@
                             return (useGradient ? dimple._helpers.fill(d, chart, series) : lineDataRow.color.stroke);
                         });
                 }
-            });
+            }).merge(markers);
 
         // Update
-        chart._handleTransition(markers, duration, chart)
+        chart._handleTransition(shapesEnterAndUpdate, duration, chart)
             .attr("cx", function (d) { return dimple._helpers.cx(d, chart, series); })
             .attr("cy", function (d) { return dimple._helpers.cy(d, chart, series); })
             .attr("r", 2 + series.lineWeight)

@@ -41,7 +41,7 @@
                     };
                 } else {
                     dp = Math.max(0, -Math.floor(Math.log(this._tick_step) / Math.LN10));
-                    returnFormat = d3.format(",." + dp + "f");
+                    returnFormat = d3.format(",." + (Number.isFinite(dp) ? dp : 0) + "f");
                 }
             } else {
                 returnFormat = function (n) { return n; };
