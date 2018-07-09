@@ -44,8 +44,8 @@ module.exports = function (grunt) {
         copy: {
             main: {
                 files: [
-                    { src: 'dist/<%= pkg.name %>.v<%= pkg.version %>.min.js', dest: 'dist/<%= pkg.name %>.latest.min.js'},
-                    { src: 'dist/<%= pkg.name %>.v<%= pkg.version %>.js', dest: 'dist/<%= pkg.name %>.latest.js'}
+                    {src: 'dist/<%= pkg.name %>.v<%= pkg.version %>.min.js', dest: 'dist/<%= pkg.name %>.latest.min.js'},
+                    {src: 'dist/<%= pkg.name %>.v<%= pkg.version %>.js', dest: 'dist/<%= pkg.name %>.latest.js'}
                 ]
             }
         },
@@ -57,33 +57,14 @@ module.exports = function (grunt) {
                 }
             }
         },
-        jslint: {
+        eslint: {
             client: {
                 src: [
                     'Gruntfile.js',
                     'dist/<%= pkg.name %>.v<%= pkg.version %>.js'
                 ],
-                directives: {
-                    browser: true,
-                    nomen: true,
-                    plusplus: true,
-                    predef: [
-                        'd3',
-                        'module',
-                        'console',
-                        'jasmine',
-                        'dimple',
-                        'module',
-                        'define',
-                        'require',
-                        'exports',
-                        'describe',
-                        'it',
-                        'xdescribe',
-                        'xit',
-                        'beforeEach',
-                        'afterEach'
-                    ]
+                options: {
+                    configFile: '.eslintrc.json'
                 }
             }
         },
@@ -121,9 +102,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-jslint');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('gruntify-eslint');
 
     // Propogate version into relevant files
     grunt.registerMultiTask('prop', 'Propagate Versions.', function () {
@@ -190,6 +170,6 @@ module.exports = function (grunt) {
     });
 
     // Default tasks
-    grunt.registerTask('default', ['concat', 'jslint', 'uglify', 'copy', 'connect', 'prop']);
+    grunt.registerTask('default', ['concat', 'eslint', 'uglify', 'copy', 'connect', 'prop']);
 
 };
