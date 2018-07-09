@@ -32,10 +32,6 @@ module.exports = function (grunt) {
                     "src/end.js"
                 ],
                 dest: 'dist/<%= pkg.name %>.v<%= pkg.version %>.js'
-            },
-            test: {
-                src: '<%= concat.dist.src %>',
-                dest: 'tmp/<%= pkg.name %>.js'
             }
         },
         uglify: {
@@ -110,48 +106,12 @@ module.exports = function (grunt) {
                         "<!----------------------------------------------------------------->\n"
             }
         },
-        karma: {
-            options: {
-                basepath: '',
-                frameworks: ['jasmine', 'requirejs'],
-                files: [
-                    'test/test-main.js',
-                    { pattern: 'lib/*.min.js', included: false },
-                    { pattern: 'tmp/*.js', included: false },
-                    { pattern: 'test/**/*.spec.js', included: false }
-                ],
-                reporters: ['progress'],
-                port: 9876,
-                colors: true,
-                browsers: ['PhantomJS']
-            },
-            unit: {
-                singleRun: true
-            },
-            continuous: {
-                background: true
-            }
-        },
         watch: {
-            srcBuild: {
+            src: {
                 files: [
-                    '<%= concat.test.src %>',
                     '<%= prop.dist.src %>'
                 ],
                 tasks: ['default']
-            },
-            src: {
-                files: [
-                    '<%= concat.test.src %>'
-                ],
-                tasks: ['concat:test', 'karma:continuous:run']
-            },
-            test: {
-                files: [
-                    'test/**/*.spec.js',
-                    'test/*.spec.js'
-                ],
-                tasks: ['karma:continuous:run']
             }
         }
     });
@@ -231,7 +191,5 @@ module.exports = function (grunt) {
 
     // Default tasks
     grunt.registerTask('default', ['concat', 'jslint', 'uglify', 'copy', 'connect', 'prop']);
-    grunt.registerTask('test:unit', ['concat:test', 'karma:unit']);
-    grunt.registerTask('test', ['karma:continuous:start', 'watch']);
 
 };
