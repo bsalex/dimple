@@ -28,10 +28,10 @@
                 key,
                 keyString,
                 rowIndex,
+                entered,
                 updated,
                 removed,
                 orderedSeriesArray,
-                theseShapesSel,
                 onEnter = function () {
                     return function (e, shape, chart, series) {
                         d3.select(shape).style("opacity", 1);
@@ -45,7 +45,6 @@
                     };
                 },
                 drawMarkers = function (d, context) {
-                    console.log(123);
                     dimple._drawMarkers(d, chart, series, duration, className, graded, onEnter(d), onLeave(d), context);
                 },
                 coord = function (position, datum) {
@@ -178,18 +177,18 @@
                 lineData[i].css = chart.getClass(lineData[i].key.length > 0 ? lineData[i].key[lineData[i].key.length - 1] : "All");
             }
 
-            if (chart._tooltipGroup !== null && chart._tooltipGroup !== undefined) {
+            if (chart._tooltipGroup) {
                 chart._tooltipGroup.remove();
             }
 
-            if (series.shapes === null || series.shapes === undefined) {
-                theseShapes = series._group.selectAll("." + className).data(lineData);
+            if (!series.shapes) {
+                theseShapes = series._group.selectAll("." + className).data(lineData, function (d) { return d.key; });
             } else {
                 theseShapes = series.shapes.data(lineData, function (d) { return d.key; });
             }
 
             // Add
-            theseShapesSel = theseShapes
+            entered = theseShapes
                 .enter()
                 .append("path")
                 .attr("id", function (d) { return dimple._createClass([d.key]); })
@@ -199,10 +198,10 @@
                 .attr("d", function (d) {
                     return d.entry;
                 })
-                .call(function (element) {
+                .call(function (context) {
                     // Apply formats optionally
                     if (!chart.noFormats) {
-                        element.attr("opacity", function (d) { return (graded ? 1 : d.color.opacity); })
+                        context.attr("opacity", function (d) { return (graded ? 1 : d.color.opacity); })
                             .style("fill", "none")
                             .style("stroke", function (d) { return (graded ? "url(#" + dimple._createClass(["fill-line-gradient-" + d.keyString]) + ")" : d.color.stroke); })
                             .style("stroke-width", series.lineWeight);
@@ -210,17 +209,15 @@
                 })
                 .each(function (d) {
                     // Pass line data to markers
-                    console.log(1);
                     d.markerData = d.data;
                     drawMarkers(d, this);
-                }).merge(theseShapes);
+                });
 
             // Update
-            updated = chart._handleTransition(theseShapesSel, duration, chart)
+            updated = chart._handleTransition(theseShapes.merge(entered), duration, chart)
                 .attr("d", function (d) { return d.update; })
                 .each(function (d) {
                     // Pass line data to markers
-                    console.log(2);
                     d.markerData = d.data;
                     drawMarkers(d, this);
                 });
@@ -238,7 +235,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapesSel;
+            series.shapes = series._group.selectAll("." + className);
 
         }
     };

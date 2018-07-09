@@ -5,8 +5,7 @@
         var markers,
             markerClasses = ["dimple-marker", className, lineDataRow.keyString],
             rem,
-            shapes,
-            shapesEnterAndUpdate;
+            shapes;
 
         // Deal with markers in the same way as main series to fix #28
         if (series._markers === null || series._markers === undefined || series._markers[lineDataRow.keyString] === undefined) {
@@ -22,7 +21,7 @@
         } else {
             shapes = markers.enter().append("circle");
         }
-        shapesEnterAndUpdate = shapes
+        shapes
             .attr("id", function (d) {
                 return dimple._createClass([d.key + " Marker"]);
             })
@@ -51,25 +50,25 @@
             })
             .attr("r", 0)
             .attr("opacity", (series.lineMarkers || lineDataRow.data.length < 2 ? lineDataRow.color.opacity : 0))
-            .call(function (element) {
+            .call(function (context) {
                 if (!chart.noFormats) {
-                    element.attr("fill", "white")
+                    context.attr("fill", "white")
                         .style("stroke-width", series.lineWeight)
                         .attr("stroke", function (d) {
                             return (useGradient ? dimple._helpers.fill(d, chart, series) : lineDataRow.color.stroke);
                         });
                 }
-            }).merge(markers);
+            });
 
         // Update
-        chart._handleTransition(shapesEnterAndUpdate, duration, chart)
+        chart._handleTransition(markers.merge(shapes), duration, chart)
             .attr("cx", function (d) { return dimple._helpers.cx(d, chart, series); })
             .attr("cy", function (d) { return dimple._helpers.cy(d, chart, series); })
             .attr("r", 2 + series.lineWeight)
             .attr("opacity", (series.lineMarkers || lineDataRow.data.length < 2 ? lineDataRow.color.opacity : 0))
-            .call(function (element) {
+            .call(function (context) {
                 if (!chart.noFormats) {
-                    element.attr("fill", "white")
+                    context.attr("fill", "white")
                         .style("stroke-width", series.lineWeight)
                         .attr("stroke", function (d) {
                             return (useGradient ? dimple._helpers.fill(d, chart, series) : lineDataRow.color.stroke);

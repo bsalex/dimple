@@ -28,6 +28,7 @@
                 key,
                 keyString,
                 rowIndex,
+                entered,
                 updated,
                 removed,
                 orderedSeriesArray,
@@ -47,7 +48,6 @@
                 lastAngle,
                 catCoord,
                 valCoord,
-                theseShapesSel,
                 onEnter = function () {
                     return function (e, shape, chart, series) {
                         d3.select(shape).style("opacity", 1);
@@ -92,17 +92,17 @@
                 },
                 addNextPoint = function (source, target, startAngle) {
                     // Given a point we need to find the next point clockwise from the start angle
-                    var i,
+                    var q,
                         point = target[target.length - 1],
                         thisAngle,
                         bestAngleSoFar = 9999,
                         returnPoint = point;
-                    for (i = 0; i < source.length; i += 1) {
-                        if (source[i].x !== point.x || source[i].y !== point.y) {
+                    for (q = 0; q < source.length; q += 1) {
+                        if (source[q].x !== point.x || source[q].y !== point.y) {
                             // get the angle in degrees since start angle
-                            thisAngle = 180 - (Math.atan2(source[i].x - point.x, source[i].y - point.y) * (180 / Math.PI));
+                            thisAngle = 180 - (Math.atan2(source[q].x - point.x, source[q].y - point.y) * (180 / Math.PI));
                             if (thisAngle > startAngle && thisAngle < bestAngleSoFar) {
-                                returnPoint = source[i];
+                                returnPoint = source[q];
                                 bestAngleSoFar = thisAngle;
                             }
                         }
@@ -332,27 +332,27 @@
                 areaData[i].css = chart.getClass(areaData[i].key.length > 0 ? areaData[i].key[areaData[i].key.length - 1] : "All");
             }
 
-            if (chart._tooltipGroup !== null && chart._tooltipGroup !== undefined) {
+            if (chart._tooltipGroup) {
                 chart._tooltipGroup.remove();
             }
 
-            if (series.shapes === null || series.shapes === undefined) {
-                theseShapes = series._group.selectAll("." + className).data(areaData);
+            if (!series.shapes) {
+                theseShapes = series._group.selectAll("." + className).data(areaData, function (d) { return d.key; });
             } else {
                 theseShapes = series.shapes.data(areaData, function (d) { return d.key; });
             }
 
             // Add
-            theseShapesSel = theseShapes
+            entered = theseShapes
                 .enter()
                 .append("path")
                 .attr("id", function (d) { return dimple._createClass([d.key]); })
                 .attr("class", function (d) { return className + " dimple-line " + d.keyString + " " + chart.customClassList.areaSeries + " " + d.css; })
                 .attr("d", function (d) { return d.entry; })
-                .call(function (element) {
+                .call(function (context) {
                     // Apply formats optionally
                     if (!chart.noFormats) {
-                        element.attr("opacity", function (d) { return (graded ? 1 : d.color.opacity); })
+                        context.attr("opacity", function (d) { return (graded ? 1 : d.color.opacity); })
                             .style("fill", function (d) { return (graded ? "url(#" + dimple._createClass(["fill-area-gradient-" + d.keyString]) + ")" : d.color.fill); })
                             .style("stroke", function (d) { return (graded ? "url(#" + dimple._createClass(["stroke-area-gradient-" + d.keyString]) + ")" : d.color.stroke); })
                             .style("stroke-width", series.lineWeight);
@@ -362,10 +362,10 @@
                     // Pass line data to markers
                     d.markerData = d.data;
                     drawMarkers(d, this);
-                }).merge(theseShapes);
+                });
 
             // Update
-            updated = chart._handleTransition(theseShapesSel, duration, chart)
+            updated = chart._handleTransition(theseShapes.merge(entered), duration, chart)
                 .attr("d", function (d) { return d.update; })
                 .each(function (d) {
                     // Pass line data to markers
@@ -386,8 +386,7 @@
             dimple._postDrawHandling(series, updated, removed, duration);
 
             // Save the shapes to the series array
-            series.shapes = theseShapesSel;
+            series.shapes = series._group.selectAll("." + className);
 
         }
     };
-

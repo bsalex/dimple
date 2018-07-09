@@ -248,4 +248,3 @@
             // Return axis for chaining
             return this;
         };
-

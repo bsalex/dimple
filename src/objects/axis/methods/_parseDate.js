@@ -21,4 +21,3 @@
             // Return the date
             return outDate;
         };
-

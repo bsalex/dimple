@@ -51,9 +51,9 @@
             .attr("cx", cx)
             .attr("cy", cy)
             .attr("r", r)
-            .call(function (element) {
+            .call(function (context) {
                 if (!chart.noFormats) {
-                    element.attr("opacity", 0)
+                    context.attr("opacity", 0)
                         .style("fill", "none")
                         .style("stroke", fill)
                         .style("stroke-width", 1);
@@ -63,9 +63,9 @@
             .duration(animDuration / 2)
             .ease(d3.easeLinear)
             .attr("r", r + series.lineWeight + 2)
-            .call(function (element) {
+            .call(function (context) {
                 if (!chart.noFormats) {
-                    element.attr("opacity", 1)
+                    context.attr("opacity", 1)
                         .style("stroke-width", 2);
                 }
             });
@@ -78,9 +78,9 @@
                 .attr("y1", (cy < dropDest.y ? cy + r + series.lineWeight + 2 : cy - r - series.lineWeight - 2))
                 .attr("x2", cx)
                 .attr("y2", (cy < dropDest.y ? cy + r + series.lineWeight + 2 : cy - r - series.lineWeight - 2))
-                .call(function (element) {
+                .call(function (context) {
                     if (!chart.noFormats) {
-                        element.style("fill", "none")
+                        context.style("fill", "none")
                             .style("stroke", fill)
                             .style("stroke-width", 2)
                             .style("stroke-dasharray", ("3, 3"))
@@ -105,9 +105,9 @@
                 .attr("y1", cy)
                 .attr("x2", (cx < dropDest.x ? cx + r + series.lineWeight + 2 : cx - r - series.lineWeight - 2))
                 .attr("y2", cy)
-                .call(function (element) {
+                .call(function (context) {
                     if (!chart.noFormats) {
-                        element.style("fill", "none")
+                        context.style("fill", "none")
                             .style("stroke", fill)
                             .style("stroke-width", 2)
                             .style("stroke-dasharray", ("3, 3"))
@@ -135,9 +135,9 @@
             .append("text")
             .attr("class", "dimple-tooltip " + chart.customClassList.tooltipLabel)
             .text(function (d) { return d; })
-            .call(function (element) {
+            .call(function (context) {
                 if (!chart.noFormats) {
-                    element.style("font-family", series.tooltipFontFamily)
+                    context.style("font-family", series.tooltipFontFamily)
                         .style("font-size", series._getTooltipFontSize());
                 }
             });
@@ -166,9 +166,9 @@
             .attr("width", w + 2 * textMargin)
             .attr("rx", 5)
             .attr("ry", 5)
-            .call(function (element) {
+            .call(function (context) {
                 if (!chart.noFormats) {
-                    element.style("fill", popupFillColor)
+                    context.style("fill", popupFillColor)
                         .style("stroke", popupStrokeColor)
                         .style("stroke-width", 2)
                         .style("opacity", 0.95);

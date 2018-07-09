@@ -1,4 +1,4 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     "use strict";
     // Project configuration.
     grunt.initConfig({
@@ -62,32 +62,33 @@ module.exports = function(grunt) {
             }
         },
         jslint: {
-            files: [
-                'Gruntfile.js',
-                'test/**/*.spec.js',
-                'dist/<%= pkg.name %>.v<%= pkg.version %>.js'
-            ],
-            directives: {
-                browser: true,
-                nomen: true,
-                plusplus: true,
-                predef: [
-                    'd3',
-                    'module',
-                    'console',
-                    'jasmine',
-                    'dimple',
-                    'module',
-                    'define',
-                    'require',
-                    'exports',
-                    'describe',
-                    'it',
-                    'xdescribe',
-                    'xit',
-                    'beforeEach',
-                    'afterEach'
-                ]
+            client: {
+                src: [
+                    'Gruntfile.js',
+                    'dist/<%= pkg.name %>.v<%= pkg.version %>.js'
+                ],
+                directives: {
+                    browser: true,
+                    nomen: true,
+                    plusplus: true,
+                    predef: [
+                        'd3',
+                        'module',
+                        'console',
+                        'jasmine',
+                        'dimple',
+                        'module',
+                        'define',
+                        'require',
+                        'exports',
+                        'describe',
+                        'it',
+                        'xdescribe',
+                        'xit',
+                        'beforeEach',
+                        'afterEach'
+                    ]
+                }
             }
         },
         prop: {

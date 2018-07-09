@@ -253,32 +253,31 @@
                             .attr("transform", gridTransform);
                     }
                 }
-
-                console.log(axis.shapes.selectAll("text"));
                 // Set some initial css values
                 handleTrans(axis.shapes.selectAll("text"))
                     .attr("class", appendClass(chart.customClassList.axisLabel))
-                    .call(function(element) {
+                    .call(function (context) {
                         if (!chart.noFormats) {
-                            element.style("font-family", axis.fontFamily)
+                            context.style("font-family", axis.fontFamily)
                                 .style("font-size", axis._getFontSize());
                         }
                     });
                 handleTrans(axis.shapes.selectAll("path, line"))
                     .attr("class", appendClass(chart.customClassList.axisLine))
-                    .call(function(element) {
+                    .call(function (context) {
                         if (!chart.noFormats) {
-                            element.style("fill", "none")
+                            context.style("fill", "none")
                                 .style("stroke", "black")
                                 .style("shape-rendering", "crispEdges");
                         }
                     });
                 if (axis.gridlineShapes !== null) {
+                    axis.gridlineShapes.selectAll("path").remove();
                     handleTrans(axis.gridlineShapes.selectAll("line"))
                         .attr("class", appendClass(chart.customClassList.gridline))
-                        .call(function(element) {
+                        .call(function (context) {
                             if (!chart.noFormats) {
-                                element.style("fill", "none")
+                                context.style("fill", "none")
                                     .style("stroke", "lightgray")
                                     .style("opacity", 0.8);
                             }
